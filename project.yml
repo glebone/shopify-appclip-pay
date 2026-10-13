@@ -37,7 +37,7 @@ targets:
       path: App/PayDemo.entitlements
       properties:
         com.apple.developer.associated-domains:
-          - applinks:$(CLIP_DOMAIN)
+          - applinks:$(CLIP_DOMAIN)?mode=developer
     scheme:
       testTargets: []
   PayClip:
@@ -71,7 +71,7 @@ targets:
       path: Clip/PayClip.entitlements
       properties:
         com.apple.developer.associated-domains:
-          - appclips:$(CLIP_DOMAIN)
+          - appclips:$(CLIP_DOMAIN)?mode=developer
         com.apple.developer.parent-application-identifiers:
           - $(AppIdentifierPrefix)$(APP_BUNDLE_ID)
         com.apple.developer.in-app-payments:
