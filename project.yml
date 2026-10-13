@@ -46,7 +46,7 @@ targets:
     sources: [Clip]
     dependencies:
       - package: CheckoutSheetKit
-        product: ShopifyAcceleratedCheckouts
+        product: ShopifyCheckoutSheetKit
       - package: PayLinkCore
         product: PayLinkCore
     info:
@@ -61,9 +61,6 @@ targets:
           NSAppClipRequestEphemeralUserNotification: false
           NSAppClipRequestLocationConfirmation: false
         STOREFRONT_DOMAIN: $(STOREFRONT_DOMAIN)
-        STOREFRONT_ACCESS_TOKEN: $(STOREFRONT_ACCESS_TOKEN)
-        STOREFRONT_API_VERSION: $(STOREFRONT_API_VERSION)
-        APPLE_PAY_MERCHANT_ID: $(APPLE_PAY_MERCHANT_ID)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).Clip
@@ -74,8 +71,6 @@ targets:
           - appclips:$(CLIP_DOMAIN)?mode=developer
         com.apple.developer.parent-application-identifiers:
           - $(AppIdentifierPrefix)$(APP_BUNDLE_ID)
-        com.apple.developer.in-app-payments:
-          - $(APPLE_PAY_MERCHANT_ID)
     scheme:
       testTargets: []
       environmentVariables:

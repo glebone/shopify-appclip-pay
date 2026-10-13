@@ -1,7 +1,9 @@
 # MfB → App Clip → Shopify Apple Pay (proof of concept)
 
-One link in Apple Messages for Business opens an App Clip with a single Apple Pay button
-backed by Shopify Checkout Kit. Spec: `docs/superpowers/specs/`. Plan: `docs/superpowers/plans/`.
+One link in Apple Messages for Business opens an App Clip that presents Shopify's checkout sheet
+(Checkout Sheet Kit) from a cart permalink; Apple Pay is served by Shopify inside that sheet. The
+clip holds no merchant ID, certificate, Storefront token, or custom app. The native Accelerated
+Checkouts button was dropped on 2026-10-13; see the change note at the top of the spec. Spec: `docs/superpowers/specs/`. Plan: `docs/superpowers/plans/`.
 
 ## Parameters
 
@@ -53,11 +55,21 @@ Observed direct Content-Type on GitHub Pages: `application/octet-stream` (2026-1
 
 ## Apple setup
 
-- Team ID, bundle ID, merchant ID and App Store Apple ID live in `Config/Local.xcconfig`.
-- Xcode automatic signing (`xcodebuild -allowProvisioningUpdates`) registered both App IDs and the
-  merchant ID `merchant.<bundle id>` on 2026-10-13; the clip's profile grants Associated Domains,
-  Apple Pay with that merchant ID, and the App Clip parent entitlement.
+- Team ID, bundle ID and App Store Apple ID live in `Config/Local.xcconfig`.
+- Xcode automatic signing (`xcodebuild -allowProvisioningUpdates`) registered both App IDs on
+  2026-10-13; the clip's profile grants Associated Domains and the App Clip parent entitlement.
 - Both targets take their version from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`;
   Apple rejects a build whose clip `CFBundleVersion` differs from the parent's.
-- The App Store Connect record is needed before any device test because the landing page's `app-id` meta value comes from it.
-- The Apple Pay *Payment Processing* certificate is created in Task 7 because its CSR comes from Shopify.
+- The App Store Connect record is needed only for Mode C: the landing page's `app-id` meta value comes
+  from it. Modes A and B work without it.
+- No Apple Pay merchant ID or payment processing certificate: Shopify is the Apple Pay web merchant
+  inside the checkout sheet.
+
+## Shopify setup
+
+- Any store on a paid plan with Shopify Payments active, test mode enabled, and Apple Pay ticked under
+  Wallets. A free Partner development store cannot provide Apple Pay.
+- One product (`Demo Pass`, 5.00, digital, Active, on the Online Store channel). Its numeric variant id
+  goes in `Config/Local.xcconfig` as `DEMO_VARIANT_ID`; the `*.myshopify.com` host as `STOREFRONT_DOMAIN`.
+- The clip opens `https://$STOREFRONT_DOMAIN/cart/$DEMO_VARIANT_ID:1` in the checkout sheet. Check it
+  with `curl -sS -o /dev/null -w "%{http_code} %{redirect_url}\n" <that url>`: expect a 302 to `/checkouts/…`.

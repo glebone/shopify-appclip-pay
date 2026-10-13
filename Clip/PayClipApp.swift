@@ -1,22 +1,13 @@
 import SwiftUI
-import ShopifyAcceleratedCheckouts
+import ShopifyCheckoutSheetKit
 import PayLinkCore
 
 @main
 struct PayClipApp: App {
     @State private var state: LaunchState = PayClipApp.initialState()
 
-    @StateObject private var configuration = ShopifyAcceleratedCheckouts.Configuration(
-        storefrontDomain: ClipConfig.storefrontDomain,
-        storefrontAccessToken: ClipConfig.storefrontAccessToken
-    )
-    @StateObject private var applePay = ShopifyAcceleratedCheckouts.ApplePayConfiguration(
-        merchantIdentifier: ClipConfig.merchantID,
-        contactFields: [.email]
-    )
-
     init() {
-        ShopifyAcceleratedCheckouts.logLevel = .all
+        ShopifyCheckoutSheetKit.configure { $0.preloading.enabled = false }
     }
 
     /// Xcode turns `_XCAppClipURL` into the browsing user activity; a launch from `devicectl`
@@ -33,8 +24,6 @@ struct PayClipApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(state: state)
-                .environmentObject(configuration)
-                .environmentObject(applePay)
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
                     state = LaunchState.from(invocationURL: activity.webpageURL)
                 }

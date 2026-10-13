@@ -7,8 +7,15 @@ public struct PayLink: Hashable {
     /// Numeric Shopify product variant ID as it appears in the admin URL.
     public let numericID: String
 
-    /// Storefront GID accepted by `AcceleratedCheckoutButtons(variantID:quantity:)`.
+    /// Storefront GID form of the variant id.
     public var variantID: String { Self.gidPrefix + numericID }
+
+    /// Shopify cart permalink for one unit of the variant. The Checkout Sheet Kit accepts it as a
+    /// checkout URL, so no Storefront token or custom app is needed.
+    /// https://help.shopify.com/en/manual/products/details/cart-permalink
+    public func checkoutURL(storeDomain: String) -> URL {
+        URL(string: "https://\(storeDomain)/cart/\(numericID):1")!
+    }
 
     public enum ParseError: Error, Equatable {
         case notHTTPS

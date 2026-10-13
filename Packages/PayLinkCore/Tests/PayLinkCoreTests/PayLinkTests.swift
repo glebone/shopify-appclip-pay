@@ -8,6 +8,12 @@ final class PayLinkTests: XCTestCase {
         XCTAssertEqual(link.variantID, "gid://shopify/ProductVariant/45678901234567")
     }
 
+    func testCheckoutURLIsCartPermalinkForOneUnit() {
+        let link = PayLink(numericID: "45678901234567")
+        XCTAssertEqual(link.checkoutURL(storeDomain: "demo-store.myshopify.com").absoluteString,
+                       "https://demo-store.myshopify.com/cart/45678901234567:1")
+    }
+
     func testParsesWithoutTrailingSlash() throws {
         let link = try PayLink.parse(URL(string: "https://example.github.io/pay?v=1")!)
         XCTAssertEqual(link.numericID, "1")

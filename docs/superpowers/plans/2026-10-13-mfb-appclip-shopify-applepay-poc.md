@@ -1293,160 +1293,47 @@ git add README.md && git commit -m "docs: Apple identifier setup" && git push
 
 ---
 
-### Task 7: Shopify side: sandbox store, scopes, token, certificate
+### Task 7: Shopify side: store with Apple Pay and one product
+
+> **Rewritten 2026-10-13.** The clip now presents Shopify's checkout sheet from a cart permalink
+> (`https://$STOREFRONT_DOMAIN/cart/$DEMO_VARIANT_ID:1`). No custom app, Storefront token, gated
+> scope, merchant ID, or Apple Pay certificate is needed. See the change note at the top of the spec.
 
 **Files:**
-- Create: `scripts/apple_pay_cert.sh`
-- Modify: `Config/Local.xcconfig` (`STOREFRONT_DOMAIN`, `STOREFRONT_ACCESS_TOKEN`, `DEMO_VARIANT_ID`)
+- Modify: `Config/Local.xcconfig` (`STOREFRONT_DOMAIN`, `DEMO_VARIANT_ID`)
 - Modify: `README.md` (add "Shopify setup" section)
 
-**Interfaces:**
-- Consumes: `$APPLE_PAY_MERCHANT_ID` from Task 6.
-- Produces: a store in Shopify Payments test mode with Apple Pay enabled, one published variant `$DEMO_VARIANT_ID`, a Storefront token `$STOREFRONT_ACCESS_TOKEN` with `write_cart_wallet_payments`, and an active Apple Pay payment processing certificate on the store.
-- Environment for the script (not stored in xcconfig): `ADMIN_API_ACCESS_TOKEN`.
+- [ ] **Step 1: A store that offers Apple Pay**
 
-- [ ] **Step 1: Create the trial store and enable test mode with Apple Pay**
+Either an existing store or a new trial. Requirements: paid plan (a free Partner development store only
+has the Bogus gateway, no Apple Pay); Settings → Payments → Shopify Payments set up and active;
+Manage → **Test mode** enabled; **Wallets** → Apple Pay ticked. Country must be one where Shopify
+Payments and Apple Pay are available.
 
-1. At https://www.shopify.com/free-trial start a trial; country **United States**. When asked to pick a plan, choose the cheapest paid plan (a paid plan is required for Shopify Payments test mode, spec F6). No real orders will ever be placed.
-2. Settings → Payments → Shopify Payments → **Complete account setup** with the business details (needed before test mode is offered in the US).
-3. Settings → Payments → Shopify Payments → Manage → **Test mode** → Enable test mode → Save.
-4. Same page → **Wallets** → tick **Apple Pay** → Save.
-5. Settings → Checkout: leave defaults. Settings → Shipping: nothing needed because the product is digital.
+Verification: open the store's web checkout in Safari on an iPhone with a card in Wallet; the Apple Pay
+button appears (spec V1).
 
-Verification: the Payments page shows "Test mode enabled" and Apple Pay listed under wallets.
+- [ ] **Step 2: The demo product**
 
-- [ ] **Step 2: Create the demo product**
+Products → Add product: title `Demo Pass`, price `5.00`, not a physical product, status Active,
+available on the Online Store channel (cart permalinks resolve through the online store). Copy the
+numeric variant id from `…/variants/<id>` into `Config/Local.xcconfig` as `DEMO_VARIANT_ID`, and the
+`*.myshopify.com` host as `STOREFRONT_DOMAIN`.
 
-Products → Add product: title `Demo Pass`, price `5.00`, untick **This is a physical product** (digital, no shipping, spec D5), tick **Charge tax** off, status **Active**, Sales channels: all (including the Headless channel after Step 3). Save. Open the product's variant (Default Title) and copy the numeric id from the URL `…/variants/<id>`. Put it in `Config/Local.xcconfig` as `DEMO_VARIANT_ID`.
-
-- [ ] **Step 3: Request the gated scopes**
-
-Fill the Shopify form at https://www.appsheet.com/start/1ff317b6-2da1-4f39-b041-c01cfada6098 once, requesting all three scopes for this store: `write_cart_wallet_payments` (Storefront, needed by Accelerated Checkouts), plus `write_mobile_payments` and `read_mobile_payments` (Admin, needed to create the Apple Pay certificate). State the use case as "native iOS Apple Pay via Checkout Kit Accelerated Checkouts, proof of concept". Approval is manual and can take days (spec R6); continue with Step 4 while waiting, and finish Steps 5–7 after approval.
-
-- [ ] **Step 4: Create the custom app and the Storefront token**
-
-1. https://dev.shopify.com/dashboard → Apps → **Create app** → name `Pay Clip Demo`. Under Access → Storefront API scopes tick `unauthenticated_read_product_listings`, `unauthenticated_read_checkouts`, `unauthenticated_write_checkouts`, `unauthenticated_read_product_inventory`. Under Admin API scopes tick nothing yet.
-2. Install the app on the trial store (Versions → Release, then Install on the store).
-3. In the store admin → Settings → Apps → the app → API credentials: copy the **Storefront API access token** into `Config/Local.xcconfig` as `STOREFRONT_ACCESS_TOKEN`, and the store's `*.myshopify.com` host as `STOREFRONT_DOMAIN`.
-4. Make sure the product is available to this app's sales channel (Products → Demo Pass → Sales channels → tick the app).
-
-Verify the token and the product with the same query the clip uses:
+- [ ] **Step 3: Verify the permalink**
 
 ```bash
-source scripts/config.sh
-curl -sS "https://$STOREFRONT_DOMAIN/api/$STOREFRONT_API_VERSION/graphql.json" \
-  -H "Content-Type: application/json" -H "X-Shopify-Storefront-Access-Token: $STOREFRONT_ACCESS_TOKEN" \
-  -d "{\"query\":\"{ node(id: \\\"gid://shopify/ProductVariant/$DEMO_VARIANT_ID\\\") { ... on ProductVariant { title price { amount currencyCode } product { title } } } }\"}"
+bash -c 'source scripts/config.sh && curl -sS -o /dev/null -w "%{http_code} %{redirect_url}\n" "https://$STOREFRONT_DOMAIN/cart/$DEMO_VARIANT_ID:1"'
 ```
 
-Expected: `{"data":{"node":{"title":"Default Title","price":{"amount":"5.0","currencyCode":"USD"},"product":{"title":"Demo Pass"}}}}`. A `node: null` means the product is not published to the app's channel; an `errors` array means the token or scopes are wrong.
+Expected: a 302 to a `/checkouts/...` URL on the store. A 404 means the variant id is wrong or the
+product is not available on the Online Store channel.
 
-- [ ] **Step 5: After approval, add the gated scopes**
-
-In the Dev Dashboard app → Access: add Storefront scope `write_cart_wallet_payments` and Admin scopes `read_mobile_payments`, `write_mobile_payments`. Release a new version and re-install on the store. Copy the **Admin API access token** (shown once) and keep it only in your shell:
+- [ ] **Step 4: Rebuild, re-render, redeploy, document, commit**
 
 ```bash
-export ADMIN_API_ACCESS_TOKEN=shpat_...
-```
-
-- [ ] **Step 6: Write `scripts/apple_pay_cert.sh`**
-
-```bash
-#!/usr/bin/env bash
-# Apple Pay payment processing certificate exchange between Shopify and Apple.
-# Follows https://shopify.dev/docs/storefronts/mobile/create-apple-payment-processing-certificates
-#
-# Usage:
-#   export ADMIN_API_ACCESS_TOKEN=shpat_...
-#   scripts/apple_pay_cert.sh create              # prints the certificate id
-#   scripts/apple_pay_cert.sh csr <id>            # writes apple_payment_processing.csr
-#   scripts/apple_pay_cert.sh upload <id> apple_pay.cer
-#   scripts/apple_pay_cert.sh status <id>
-set -euo pipefail
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$root/scripts/config.sh"
-: "${ADMIN_API_ACCESS_TOKEN:?export ADMIN_API_ACCESS_TOKEN first}"
-
-api="https://$STOREFRONT_DOMAIN/admin/api/$STOREFRONT_API_VERSION"
-hdr=(-H "X-Shopify-Access-Token: $ADMIN_API_ACCESS_TOKEN" -H "Content-Type: application/json")
-
-case "${1:-}" in
-  create)
-    curl -sS -X POST "$api/apple_pay_certificates.json" "${hdr[@]}" -d '{"apple_pay_certificate":{}}' \
-      | python3 -I -c 'import json,sys; c=json.load(sys.stdin)["apple_pay_certificate"]; print(c["id"], c["status"])'
-    ;;
-  status)
-    curl -sS "$api/apple_pay_certificates/${2:?id}.json" "${hdr[@]}" \
-      | python3 -I -c 'import json,sys; c=json.load(sys.stdin)["apple_pay_certificate"]; print(c["id"], c["status"], c.get("merchant_id"))'
-    ;;
-  csr)
-    curl -sS "$api/apple_pay_certificates/${2:?id}/csr.json" "${hdr[@]}" \
-      | python3 -I -c 'import json,sys,base64; k=json.load(sys.stdin)["csr"]["key"]; sys.stdout.buffer.write(base64.b64decode(k))' \
-      > apple_payment_processing.csr
-    echo "wrote apple_payment_processing.csr ($(wc -c < apple_payment_processing.csr) bytes)"
-    ;;
-  upload)
-    id="${2:?id}"; cer="${3:?apple_pay.cer}"
-    encoded="$(base64 < "$cer" | tr -d '\n')"
-    python3 -I - "$id" "$APPLE_PAY_MERCHANT_ID" "$encoded" <<'PY' > /tmp/apple_pay_upload.json
-import json, sys
-cid, merchant, enc = sys.argv[1:4]
-print(json.dumps({"apple_pay_certificate": {"id": int(cid), "status": "completed",
-                  "merchant_id": merchant, "encoded_signed_certificate": enc}}))
-PY
-    curl -sS -X PUT "$api/apple_pay_certificates/$id.json" "${hdr[@]}" -d @/tmp/apple_pay_upload.json \
-      | python3 -I -c 'import json,sys; c=json.load(sys.stdin)["apple_pay_certificate"]; print(c["id"], c["status"], c["merchant_id"])'
-    rm -f /tmp/apple_pay_upload.json
-    ;;
-  *)
-    sed -n '2,10p' "$0"; exit 1 ;;
-esac
-```
-
-- [ ] **Step 7: Run the certificate exchange**
-
-```bash
-chmod +x scripts/apple_pay_cert.sh
-scripts/apple_pay_cert.sh create          # note the id, e.g. "123456 pending" or "123456 csr"
-scripts/apple_pay_cert.sh status 123456   # repeat until the second word is "csr"
-scripts/apple_pay_cert.sh csr 123456
-```
-
-Then in https://developer.apple.com/account/resources/certificates/add choose **Apple Pay Payment Processing Certificate** (not Merchant Identity), select the merchant ID `$APPLE_PAY_MERCHANT_ID`, upload `apple_payment_processing.csr`, download `apple_pay.cer`. Then:
-
-```bash
-scripts/apple_pay_cert.sh upload 123456 ~/Downloads/apple_pay.cer
-scripts/apple_pay_cert.sh status 123456
-```
-
-Expected: `123456 completed merchant.com.<yourname>.payclipdemo`. On the Apple certificate page, the first certificate is active by default; do not click Activate on later ones before uploading (F5 guide warning).
-
-- [ ] **Step 8: Verify Apple Pay in the store's web checkout (spec V1)**
-
-On the test iPhone, in Safari, open `https://$STOREFRONT_DOMAIN/products/demo-pass`, tap Buy it now. The checkout must offer an Apple Pay button at the top. Complete it with a real card on the device: test mode means no charge (F6). In the admin, Orders shows the order with a **Test** badge. Cancel/archive it.
-
-If Apple Pay does not appear: re-check Step 1.4 and that the device has a card in Wallet.
-
-- [ ] **Step 9: Document and commit**
-
-Append to README:
-
-```markdown
-## Shopify setup
-
-1. US trial store, cheapest paid plan, Shopify Payments account completed, **test mode on**, Apple Pay ticked under Wallets.
-2. Product "Demo Pass", digital, 5.00 USD, published to the custom app's channel. Variant id → `DEMO_VARIANT_ID`.
-3. Custom app in the Dev Dashboard. Storefront token → `STOREFRONT_ACCESS_TOKEN`. Gated scopes
-   (`write_cart_wallet_payments`, `read/write_mobile_payments`) requested via Shopify's form; added after approval.
-4. Apple Pay payment processing certificate: `scripts/apple_pay_cert.sh create|csr|upload|status` with
-   `ADMIN_API_ACCESS_TOKEN` exported. Never commit `.csr`/`.cer` files.
-5. Web checkout on the phone shows Apple Pay and creates a Test order.
-```
-
-```bash
-git add scripts/apple_pay_cert.sh README.md
-git commit -m "feat(shopify): Apple Pay certificate exchange script and store setup notes"
-git push
+xcodegen generate && scripts/render_site.sh && scripts/deploy_site.sh
+git add README.md site && git commit -m "feat(shopify): store and demo product wired in" && git push
 ```
 
 ---

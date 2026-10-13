@@ -16,11 +16,6 @@ APP_STORE_ID = 0
 
 // Shopify
 STOREFRONT_DOMAIN = example-store.myshopify.com
-STOREFRONT_ACCESS_TOKEN = 00000000000000000000000000000000
-STOREFRONT_API_VERSION = 2026-04
-
-// Apple Pay merchant ID registered in the developer portal (Task 6)
-APPLE_PAY_MERCHANT_ID = merchant.com.example.payclipdemo
 
 // Numeric product variant ID of the demo item (Task 7). Appears in the admin URL
 // admin.shopify.com/store/<store>/products/<product>/variants/<DEMO_VARIANT_ID>

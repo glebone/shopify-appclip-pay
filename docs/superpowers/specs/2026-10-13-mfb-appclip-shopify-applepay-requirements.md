@@ -2,6 +2,15 @@
 
 Date: 2026-10-13
 Status: Draft for review
+
+> **Change 2026-10-13 (after Mode A passed):** the user does not want to hold an Apple Pay
+> merchant identity or run a per-store certificate exchange, and wants a future public app
+> to work for any merchant without onboarding. Payment therefore goes through the R1
+> fallback, Shopify's Checkout Sheet Kit (web checkout in the SDK's sheet, Apple Pay served
+> by Shopify as the web merchant), using a cart permalink as the checkout URL. This removes
+> F5's merchant ID, certificate, gated scopes, custom app, and Storefront token. FR5–FR7
+> now read: one screen that presents Shopify's checkout sheet; Apple Pay is a button inside
+> that sheet; `onComplete` / `onCancel` / `onFail` keep their meaning. D2 is withdrawn.
 Stage: Requirements discovery (no architecture or implementation decisions yet)
 
 ## 1. Goal
