@@ -1,0 +1,22 @@
+# Xcode
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+*.ipa
+*.dSYM.zip
+
+# Secrets and local parameters
+Config/Local.xcconfig
+*.cer
+*.csr
+*.p12
+.env
+
+# macOS
+.DS_Store
+
+# plan workspace
+.superpowers/

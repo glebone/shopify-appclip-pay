@@ -1,0 +1,27 @@
+// Copy to Config/Local.xcconfig and fill in. Never commit Local.xcconfig.
+// xcconfig syntax: KEY = value. Values must not contain "//" (treated as a comment).
+
+// Apple Developer team ID (10 characters), from developer.apple.com/account → Membership
+DEVELOPMENT_TEAM = ABCDE12345
+
+// Parent app bundle ID. The App Clip is always $(APP_BUNDLE_ID).Clip
+APP_BUNDLE_ID = com.example.payclipdemo
+
+// Host that serves site/ (GitHub Pages). No scheme, no path.
+CLIP_DOMAIN = example.github.io
+
+// Numeric Apple ID of the app record in App Store Connect (App Information → General → Apple ID).
+// Use 0 until Task 6 creates the record.
+APP_STORE_ID = 0
+
+// Shopify
+STOREFRONT_DOMAIN = example-store.myshopify.com
+STOREFRONT_ACCESS_TOKEN = 00000000000000000000000000000000
+STOREFRONT_API_VERSION = 2026-04
+
+// Apple Pay merchant ID registered in the developer portal (Task 6)
+APPLE_PAY_MERCHANT_ID = merchant.com.example.payclipdemo
+
+// Numeric product variant ID of the demo item (Task 7). Appears in the admin URL
+// admin.shopify.com/store/<store>/products/<product>/variants/<DEMO_VARIANT_ID>
+DEMO_VARIANT_ID = 0
