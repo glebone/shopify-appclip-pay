@@ -46,7 +46,7 @@ Universal Link PoC that already lives there. `CLIP_DOMAIN = glebone.github.io`.
 After changing any key in `Config/Local.xcconfig`: `scripts/render_site.sh`, commit `site/`,
 `scripts/deploy_site.sh`, then `scripts/check_aasa.sh`.
 
-Observed direct Content-Type on GitHub Pages: `application/octet-stream` (2026-10-13). Apple CDN status: 200, serves the same JSON, so the octet-stream type is accepted. The legacy Pages build takes about a minute after `deploy_site.sh`; `check_aasa.sh` exits 1 until it lands.
+Observed direct Content-Type on GitHub Pages: `application/octet-stream` (2026-10-13). Apple CDN status: 200, serves the same JSON, so the octet-stream type is accepted. The legacy Pages build takes about a minute after `deploy_site.sh`; `check_aasa.sh` exits 1 until the direct file, Apple's CDN copy, and the landing page meta all carry the configured clip id. Apple's CDN kept the previous copy for a while after Pages had updated (observed 2026-10-13), so the CDN line can lag the other two; device tests in Task 8 use `?mode=developer` on the associated domain so the phone reads the site directly.
 
 ## Apple setup
 
