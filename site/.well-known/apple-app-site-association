@@ -1,0 +1,13 @@
+{
+  "appclips": {
+    "apps": ["ABCDE12345.com.example.payclipdemo.Clip"]
+  },
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["ABCDE12345.com.example.payclipdemo"],
+        "components": [{ "/": "/pay/*" }]
+      }
+    ]
+  }
+}

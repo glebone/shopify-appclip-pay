@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-itunes-app" content="app-id=0, app-clip-bundle-id=com.example.payclipdemo.Clip, app-clip-display=card">
+  <meta property="og:title" content="Pay with Apple Pay">
+  <meta property="og:description" content="Tap to pay in seconds.">
+  <meta property="og:image" content="https://example.github.io/preview.png">
+  <title>Pay</title>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 32px 16px; text-align: center; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Pay</h1>
+  <p id="item" class="muted"></p>
+  <p>Open this link on an iPhone running iOS 17 or later to pay with Apple Pay.</p>
+  <p class="muted">If no App Clip card appeared, this page is the fallback (spec FR2).</p>
+  <script>
+    var v = new URLSearchParams(location.search).get('v');
+    document.getElementById('item').textContent = v ? 'Item ' + v : 'No item specified.';
+  </script>
+</body>
+</html>
