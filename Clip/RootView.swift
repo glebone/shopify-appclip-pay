@@ -18,7 +18,7 @@ struct RootView: View {
             }
             .padding()
         case .ready(let link):
-            PayView(link: link)
+            PayView(link: link).id(link)  // a new link rebuilds PayView state (variant, status)
         }
     }
 }

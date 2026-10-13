@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Source this file: `source scripts/config.sh`
 # Exports every KEY = value line of Config/Local.xcconfig as a shell variable.
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "scripts/config.sh must be sourced from bash (zsh lacks BASH_SOURCE/BASH_REMATCH). Use: bash -c 'source scripts/config.sh && ...'" >&2
+  return 1 2>/dev/null || exit 1
+fi
 _cfg="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/Config/Local.xcconfig"
 if [[ ! -f "$_cfg" ]]; then
   echo "Missing $_cfg. Copy Config/Local.xcconfig.example and fill it in." >&2

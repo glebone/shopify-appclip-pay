@@ -6,7 +6,8 @@ backed by Shopify Checkout Kit. Spec: `docs/superpowers/specs/`. Plan: `docs/sup
 ## Parameters
 
 Copy `Config/Local.xcconfig.example` to `Config/Local.xcconfig` and fill every key.
-Shell scripts read the same file via `source scripts/config.sh`.
+Shell scripts read the same file via `source scripts/config.sh` (bash only; from zsh use
+`bash -c 'source scripts/config.sh && echo "$CLIP_DOMAIN"'`).
 
 ## Build
 
@@ -18,6 +19,8 @@ Schemes: `PayDemo` (parent app), `PayClip` (App Clip, launches with `_XCAppClipU
 ## Unit tests
 
     swift test --package-path Packages/PayLinkCore
+    python3 -I -m unittest discover -s scripts/tests -p 'test_*.py'
+    scripts/tests/test_config_sh.sh
 
 ## Demo modes
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// The parsed form of an App Clip invocation URL: `https://<domain>/pay/?v=<numeric variant id>`.
-public struct PayLink: Equatable {
+public struct PayLink: Hashable {
     public static let gidPrefix = "gid://shopify/ProductVariant/"
 
     /// Numeric Shopify product variant ID as it appears in the admin URL.

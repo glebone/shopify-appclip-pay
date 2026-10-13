@@ -50,3 +50,13 @@ final class PayLinkTests: XCTestCase {
         }
     }
 }
+
+final class PayLinkIdentityTests: XCTestCase {
+    func testPayLinkIsHashableSoViewsCanKeyOnIt() {
+        // Review fix 1: RootView uses .id(link) so a second link rebuilds PayView's state
+        let a = PayLink(numericID: "1"), b = PayLink(numericID: "2"), a2 = PayLink(numericID: "1")
+        let set: Set<PayLink> = [a, b, a2]
+        XCTAssertEqual(set.count, 2)
+        XCTAssertEqual(a.hashValue, a2.hashValue)
+    }
+}
