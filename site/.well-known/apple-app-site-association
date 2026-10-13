@@ -5,6 +5,13 @@
   "applinks": {
     "details": [
       {
+        "appIDs": ["YA2642A35F.com.masterofcode.linkdemo"],
+        "components": [
+          { "/": "/UniversalLinkTest/amb/*", "comment": "AMB rich links open the app at the matching screen" },
+          { "/": "/UniversalLinkTest/redirect-demo*", "exclude": true, "comment": "Counter-example page must stay in Safari" }
+        ]
+      },
+      {
         "appIDs": ["ABCDE12345.com.example.payclipdemo"],
         "components": [{ "/": "/pay/*" }]
       }
