@@ -24,7 +24,10 @@ Schemes: `PayDemo` (parent app), `PayClip` (App Clip, launches with `_XCAppClipU
 
 ## Demo modes
 
-- Mode A: run the `PayClip` scheme on a device; `_XCAppClipURL` supplies the link.
+- Mode A: run the `PayClip` scheme on a device; `_XCAppClipURL` supplies the link. Debug builds also read
+  the variable directly, so a command-line launch works too:
+  `xcrun devicectl device process launch --device <udid> --environment-variables '{"_XCAppClipURL":"https://glebone.github.io/pay/?v=0"}' com.glebone.payclipdemo.Clip`
+  (verified on iPhone Air 2026-10-13: pay view with a Storefront error, as expected before Task 7).
 - Mode B: register a Local Experience, then text the link from a contact.
 - Mode C: App Store release, then `scripts/send_mfb_appclip.sh`.
 
