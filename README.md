@@ -47,3 +47,14 @@ After changing any key in `Config/Local.xcconfig`: `scripts/render_site.sh`, com
 `scripts/deploy_site.sh`, then `scripts/check_aasa.sh`.
 
 Observed direct Content-Type on GitHub Pages: `application/octet-stream` (2026-10-13). Apple CDN status: 200, serves the same JSON, so the octet-stream type is accepted. The legacy Pages build takes about a minute after `deploy_site.sh`; `check_aasa.sh` exits 1 until it lands.
+
+## Apple setup
+
+- Team ID, bundle ID, merchant ID and App Store Apple ID live in `Config/Local.xcconfig`.
+- Xcode automatic signing (`xcodebuild -allowProvisioningUpdates`) registered both App IDs and the
+  merchant ID `merchant.<bundle id>` on 2026-10-13; the clip's profile grants Associated Domains,
+  Apple Pay with that merchant ID, and the App Clip parent entitlement.
+- Both targets take their version from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml`;
+  Apple rejects a build whose clip `CFBundleVersion` differs from the parent's.
+- The App Store Connect record is needed before any device test because the landing page's `app-id` meta value comes from it.
+- The Apple Pay *Payment Processing* certificate is created in Task 7 because its CSR comes from Shopify.

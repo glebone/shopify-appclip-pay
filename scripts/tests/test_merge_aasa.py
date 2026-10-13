@@ -26,6 +26,13 @@ class MergeAASATests(unittest.TestCase):
         pay = [d for d in out["applinks"]["details"] if d["components"] == [{"/": "/pay/*"}]]
         self.assertEqual(pay, OURS["applinks"]["details"])
 
+    def test_drops_clip_of_the_parent_it_replaced(self):
+        existing = {"appclips": {"apps": ["OLDTEAM.com.example.payclipdemo.Clip", "T9.com.other.Clip"]},
+                    "applinks": {"details": [
+                        {"appIDs": ["OLDTEAM.com.example.payclipdemo"], "components": [{"/": "/pay/*"}]}]}}
+        out = merge_aasa.merge(existing, OURS)
+        self.assertEqual(out["appclips"]["apps"], ["T9.com.other.Clip", "T1.com.x.pay.Clip"])
+
     def test_keeps_other_appclips_apps(self):
         existing = {"appclips": {"apps": ["T9.com.other.Clip"]}}
         out = merge_aasa.merge(existing, OURS)

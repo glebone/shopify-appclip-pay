@@ -1,18 +1,11 @@
 {
   "appclips": {
-    "apps": ["ABCDE12345.com.example.payclipdemo.Clip"]
+    "apps": ["YA2642A35F.com.glebone.payclipdemo.Clip"]
   },
   "applinks": {
     "details": [
       {
-        "appIDs": ["YA2642A35F.com.masterofcode.linkdemo"],
-        "components": [
-          { "/": "/UniversalLinkTest/amb/*", "comment": "AMB rich links open the app at the matching screen" },
-          { "/": "/UniversalLinkTest/redirect-demo*", "exclude": true, "comment": "Counter-example page must stay in Safari" }
-        ]
-      },
-      {
-        "appIDs": ["ABCDE12345.com.example.payclipdemo"],
+        "appIDs": ["YA2642A35F.com.glebone.payclipdemo"],
         "components": [{ "/": "/pay/*" }]
       }
     ]

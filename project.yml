@@ -16,6 +16,8 @@ settings:
   base:
     DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
     CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.10"
     TARGETED_DEVICE_FAMILY: "1"
 targets:
@@ -51,6 +53,8 @@ targets:
       path: Clip/Info.plist
       properties:
         CFBundleDisplayName: Pay
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         NSAppClip:
