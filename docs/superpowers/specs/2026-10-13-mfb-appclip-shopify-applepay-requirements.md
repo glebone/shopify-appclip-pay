@@ -236,16 +236,18 @@ V5. Submit parent app + App Clip; on approval run Mode C via Infobip.
 - Production hardening of the sending side (retries, webhooks, templates).
 - Android or RCS equivalents.
 
-## 10. Open questions for the user
+## 10. Decisions (user asked for the minimal POC; defaults applied)
 
-Q1. Is a paid Shopify trial store with a US business profile acceptable for
-    the sandbox, given F6? If not, the only SDK path left is Checkout Sheet
-    Kit with the Test gateway, which has no Apple Pay.
-Q2. Do you have (or can you create) a US Apple Pay merchant entity for the
-    merchant ID and Shopify payment processing certificate?
-Q3. Is submitting a minimal parent app to the App Store acceptable for this
-    POC, or should Mode B (Local Experience + iMessage) be the finish line?
-Q4. GitHub Pages: is a custom domain already attached, or will it be
-    `<user>.github.io`? Either works for AASA, but the domain name is baked
-    into entitlements and App Store Connect, so it should not change later.
-Q5. Shipping (A4): digital product, or physical with one flat rate?
+D1. Sandbox store: US trial store on the cheapest paid plan, Shopify Payments
+    in test mode, Apple Pay enabled under Wallets. This is the only Shopify
+    path that offers Apple Pay without real money.
+D2. Apple Pay merchant: a merchant ID under the existing Apple Developer
+    team; the payment processing certificate is exchanged with the trial
+    store. US entity assumed.
+D3. Finish line: Mode B (Local Experience + link in a regular iMessage from
+    a contact) is the first milestone and proves the chain. Mode C (App
+    Store release + Infobip `APP_CLIP` message) is the second milestone,
+    attempted only after Mode B passes.
+D4. Domain: whatever GitHub Pages domain the user already has. It is a
+    parameter in the plan, set once, never changed afterward.
+D5. Product: a digital item that requires no shipping, priced above 1 USD.
